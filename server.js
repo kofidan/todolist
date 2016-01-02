@@ -1,23 +1,29 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 var PORT = process.env.PORT || '3000';
+var todoNextId = 1;
+var todo = [];
 
-var todo = [{
-	id : 1,
-	description : 'Wake up, pray and clean your body',
-	status : true
-},
-{
-	id : 2,
-	description : 'Set off to work by 7:00 AM',
-	status : true
-},
-{
-	id : 3,
-	description : 'Get to office by 8:00 AM',
-	status : false
-}
-]
+app.use(bodyParser.json());
+
+
+// var todo = [{
+// 	id : 1,
+// 	description : 'Wake up, pray and clean your body',
+// 	status : true
+// },
+// {
+// 	id : 2,
+// 	description : 'Set off to work by 7:00 AM',
+// 	status : true
+// },
+// {
+// 	id : 3,
+// 	description : 'Get to office by 8:00 AM',
+// 	status : false
+// }
+// ]
 app.get('/', function(req, res){
 	res.send('Wonderful Express!');
 });
@@ -42,6 +48,14 @@ app.get('/todo/:id', function(req, res){
 	}else{
 		res.sendStatus(404).send();
 	}
+});
+
+app.post('/todo', function(req, res){
+	var body = req.body;
+	body.id = todoNextId++;
+	todo.push(body);
+	//console.log('description : '+ body.description);
+	res.json(body);
 });
 
 app.use(express.static(__dirname + '/public'));
