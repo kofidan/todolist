@@ -29,10 +29,12 @@ app.get('/', function(req, res){
 	res.send('Wonderful Express!');
 });
 
+//GET /todo
 app.get('/todo', function(req, res){
 	res.json(todo);
 });
 
+//GET /todo/:id
 app.get('/todo/:id', function(req, res){
 	var todoId = parseInt(req.params.id, 10);
 	console.log('Todo Id : '+ todoId);
@@ -54,6 +56,7 @@ app.get('/todo/:id', function(req, res){
 	}
 });
 
+//POST /todo
 app.post('/todo', function(req, res){
 	var body = _.pick(req.body, 'description', 'status');
 
@@ -66,6 +69,19 @@ app.post('/todo', function(req, res){
 	todo.push(body);
 	//console.log('description : '+ body.description);
 	res.json(body);
+});
+
+//DELETE /todo/:id
+app.delete('/todo/:id', function(req, res){
+	var todoId = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todo, {id: todoId});
+
+	if(!matchedTodo){
+		 res.status(404).json({"error": "no todo found with that id"});
+	}else{
+		todo = _.without(todo, matchedTodo);
+		res.json(matchedTodo);
+	}
 });
 
 app.use(express.static(__dirname + '/public'));
