@@ -30,9 +30,17 @@ app.get('/', function(req, res){
 	res.send('Wonderful Express!');
 });
 
-//GET /todo
+//GET /todo?status=true;
 app.get('/todo', function(req, res){
-	res.json(todo);
+	var queryParams = req.query;
+	var filteredTodo = todo;
+
+	if(queryParams.hasOwnProperty('status') && queryParams.status === 'true'){
+		filteredTodo = _.where(filteredTodo, {status: true});
+	}else if(queryParams.hasOwnProperty('status') && queryParams.status === 'false'){
+		filteredTodo = _.where(filteredTodo, {status: false});
+	}
+	res.json(filteredTodo);
 });
 
 //GET /todo/:id
