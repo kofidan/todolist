@@ -33,14 +33,20 @@ app.get('/', function(req, res){
 //GET /todo?status=true;
 app.get('/todo', function(req, res){
 	var queryParams = req.query;
-	var filteredTodo = todo;
+	var filteredTodos = todo;
 
 	if(queryParams.hasOwnProperty('status') && queryParams.status === 'true'){
-		filteredTodo = _.where(filteredTodo, {status: true});
+		filteredTodos = _.where(filteredTodos, {status: true});
 	}else if(queryParams.hasOwnProperty('status') && queryParams.status === 'false'){
-		filteredTodo = _.where(filteredTodo, {status: false});
+		filteredTodos = _.where(filteredTodos, {status: false});
 	}
-	res.json(filteredTodo);
+
+	if(queryParams.hasOwnProperty('q') && queryParams.q.length > 0){
+		filteredTodos = _.filter(filteredTodos, function(todo){
+			return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
+		});
+	}
+	res.json(filteredTodos);
 });
 
 //GET /todo/:id
@@ -98,16 +104,16 @@ app.delete('/todo/:id', function(req, res){
 app.put('/todo/:id', function(req, res){
 	var todoId = parseInt(req.params.id, 10);
 	var matchedTodo = _.findWhere(todo, {id: todoId});
-	var body = _.pick(req.body, 'description', 'completed');
+	var body = _.pick(req.body, 'description', 'status');
 	var validAttributes = {};
 
 	if(!matchedTodo){
 		return res.status(404).send();
 	}
 
-	if(body.hasOwnProperty('completed') && _.isBoolean(body.completed)){
-		validAttributes.completed = body.completed;
-	}else if(body.hasOwnProperty('completed')){
+	if(body.hasOwnProperty('status') && _.isBoolean(body.status)){
+		validAttributes.status = body.status;
+	}else if(body.hasOwnProperty('status')){
 		return res.status(404).send();
 	}
 
